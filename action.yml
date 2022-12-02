@@ -1,0 +1,37 @@
+name: cargo test report
+author: Gary Tierney
+description: Create JUnit reports from Cargo tests (nightly only)
+branding:
+  icon: activity
+  color: green
+
+inputs:
+  cargo-opts:
+    description: Command-line arguments forwarded to Cargo
+    required: false
+    default: '--all'
+  test-opts:
+    description: Command-line arguments forwarded to libtest
+    required: false
+    default: '-Z unstable-options --show-output'
+
+runs:
+  using: composite
+  steps:
+    - id: setup
+      name: Run tests
+      run: |
+        test_counter=0
+        cargo test "${CARGO_OPTS[@]}" -- -Z unstable-options "${TEST_OPTS[@]}" --format=junit |
+        while IFS="\n" read -r line; do
+          file="./target/test-$test_counter.xml"
+        
+          echo "$line" > "$file"
+          echo "Report written to $file"
+        
+          ((test_counter=test_counter+1))
+        done
+      env:
+        CARGO_OPTS: ${{ inputs.cargo-opts }}
+        TEST_OPTS: ${{ inputs.test-opts }}
+      shell: bash
