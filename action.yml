@@ -17,7 +17,7 @@ inputs:
   test-opts:
     description: Command-line arguments forwarded to libtest
     required: false
-    default: "-Z unstable-options --show-output"
+    default: "--show-output"
   test-prefix:
     description: Prefix added to test-reports, use to disambiguate with other test runs
     required: false
