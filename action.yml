@@ -23,7 +23,6 @@ inputs:
     required: false
     default: "test"
 
-
 outputs:
   report-glob:
     description: A glob pattern that can be used by other actions to find the reports that were created
@@ -36,7 +35,7 @@ runs:
       name: Run tests
       run: |
         test_counter=0
-        cargo "${TEST_COMMAND[@]}" "${CARGO_OPTS[@]}" -- -Z unstable-options "${TEST_OPTS[@]}" --format=junit |
+        cargo $TEST_COMMAND $CARGO_OPTS -- -Z unstable-options $TEST_OPTS --format=junit |
         while IFS="\n" read -r line; do
           file="./target/$TEST_PREFIX-$test_counter.xml"
         
