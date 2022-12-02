@@ -9,22 +9,29 @@ inputs:
   cargo-opts:
     description: Command-line arguments forwarded to Cargo
     required: false
-    default: '--all'
+    default: "--all"
+  test-command:
+    description: The cargo sub-command to execute tests using (i.e. "miri test")
+    required: false
+    default: "test"
   test-opts:
     description: Command-line arguments forwarded to libtest
     required: false
-    default: '-Z unstable-options --show-output'
-
+    default: "-Z unstable-options --show-output"
+  test-prefix:
+    description: Prefix added to test-reports, use to disambiguate with other test runs
+    required: false
+    default: "test"
 runs:
   using: composite
   steps:
-    - id: setup
+    - id: run
       name: Run tests
       run: |
         test_counter=0
-        cargo test "${CARGO_OPTS[@]}" -- -Z unstable-options "${TEST_OPTS[@]}" --format=junit |
+        cargo "${TEST_COMMAND[@]}" "${CARGO_OPTS[@]}" -- -Z unstable-options "${TEST_OPTS[@]}" --format=junit |
         while IFS="\n" read -r line; do
-          file="./target/test-$test_counter.xml"
+          file="./target/$TEST_PREFIX-$test_counter.xml"
         
           echo "$line" > "$file"
           echo "Report written to $file"
@@ -33,5 +40,7 @@ runs:
         done
       env:
         CARGO_OPTS: ${{ inputs.cargo-opts }}
+        TEST_COMMAND: ${{ inputs.test-command }}
         TEST_OPTS: ${{ inputs.test-opts }}
+        TEST_PREFIX: ${{ inputs.test-prefix }}
       shell: bash
