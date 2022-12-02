@@ -22,6 +22,13 @@ inputs:
     description: Prefix added to test-reports, use to disambiguate with other test runs
     required: false
     default: "test"
+
+
+outputs:
+  report-glob:
+    description: A glob pattern that can be used by other actions to find the reports that were created
+    value: ${{steps.run.outputs.report-glob}}
+
 runs:
   using: composite
   steps:
@@ -38,6 +45,8 @@ runs:
         
           ((test_counter=test_counter+1))
         done
+
+        echo "report-glob=./target/$TEST_PREFIX-*.xml" >> $GITHUB_OUTPUT
       env:
         CARGO_OPTS: ${{ inputs.cargo-opts }}
         TEST_COMMAND: ${{ inputs.test-command }}
